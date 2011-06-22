@@ -35,7 +35,7 @@
        <tr>
          <th><%= t 'browse.note.opened_by' %></th>
          <% if @note.author.nil? %>
-           <td> <%= @note.author_name %> </td>
+           <td> <%= h(@note.author_name) %> </td>
          <% else %>
            <td><%= link_to h(@note.author_name), :controller => "user", :action => "view", :display_name => @note.author_name %></td>
          <% end %>
@@ -60,10 +60,11 @@
           <th width="20%"> <%= t 'browse.note.date' %></th> 
         </tr>
         <% @note.comments[1..-1].each do |comment| %>
+          <% if comment.event == "commented" %>
           <tr>
             <td>
               <% if comment.author.nil? %>
-                <%= comment.author_name %>
+                <%= h(comment.author_name) %>
               <% else %>
                 <%= link_to h(comment.author.display_name), :controller => "user", :action => "view", :display_name => comment.author.display_name %>					
               <% end %>
@@ -71,6 +72,7 @@
             <td> <%= h(comment.body) %> </td>
             <td> <%= l comment.created_at %> </td>
           </tr>
+          <% end %>
         <% end %>
       </table>
     <% end %>

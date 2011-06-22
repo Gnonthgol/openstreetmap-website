@@ -40,13 +40,13 @@ OpenLayers.Layer.OpenStreetBugs = new OpenLayers.Class(OpenLayers.Layer.Markers,
 	 * The icon to be used for an open bug
 	 * @var OpenLayers.Icon
 	*/
-	iconOpen : new OpenLayers.Icon("/images/open_bug_marker.png", new OpenLayers.Size(22, 22), new OpenLayers.Pixel(-11, -11)),
+	iconOpen : new OpenLayers.Icon("/images/open_note_marker.png", new OpenLayers.Size(22, 22), new OpenLayers.Pixel(-11, -11)),
 
 	/**
 	 * The icon to be used for a closed bug
 	 * @var OpenLayers.Icon
 	*/
-	iconClosed : new OpenLayers.Icon("/images/closed_bug_marker.png", new OpenLayers.Size(22, 22), new OpenLayers.Pixel(-11, -11)),
+	iconClosed : new OpenLayers.Icon("/images/closed_note_marker.png", new OpenLayers.Size(22, 22), new OpenLayers.Pixel(-11, -11)),
 
 	/**
 	 * The projection of the coordinates sent by the OpenStreetBugs API.
@@ -321,7 +321,7 @@ OpenLayers.Layer.OpenStreetBugs = new OpenLayers.Class(OpenLayers.Layer.Markers,
 
 		el1.appendChild(document.createTextNode(" ["));
 		el2 = document.createElement("a");
-		el2.href = "/browse/bug/" + id;
+		el2.href = "/browse/note/" + id;
 		el2.onclick = function(){ layer.map.setCenter(putAJAXMarker.bugs[id][0].clone().transform(layer.apiProjection, layer.map.getProjectionObject()), 15); };
 		el2.appendChild(document.createTextNode(i18n("javascripts.osb.Details")));
 		el1.appendChild(el2);
