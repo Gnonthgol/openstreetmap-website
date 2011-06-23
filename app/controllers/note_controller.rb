@@ -376,7 +376,7 @@ private
       attributes[:author_name] = name + " (a)"
     end
 
-    note.comments.create(attributes)
+    comment = note.comments.create(attributes)
 
     note.comments.map { |c| c.author }.uniq.each do |user|
       if user and user != @user
