@@ -87,13 +87,13 @@ OpenLayers.Layer.OpenStreetBugs = new OpenLayers.Class(OpenLayers.Layer.Markers,
 	 * A URL to append lon=123&lat=123&zoom=123 for the Permalinks.
 	 * @var String
 	*/
-	permalinkURL : "http://www.openstreetmap.org/",
+       permalinkURL : document.location.pathname,
 
 	/**
 	 * A CSS file to be included. Set to null if you don’t need this.
 	 * @var String
 	*/
-	theme : "http://osm.cdauth.de/map/openstreetbugs.css",
+	theme : null,
 
 	/**
 	 * @param String name
@@ -495,7 +495,8 @@ OpenLayers.Layer.OpenStreetBugs = new OpenLayers.Class(OpenLayers.Layer.Markers,
 	*/
 	closeBug: function(id) {
 		this.apiRequest("note/"+encodeURIComponent(id)+"/close"
-			+ "?format=js"
+			+ "?name="+encodeURIComponent(this.getUserName())
+			+ "&format=js"
 		);
 	},
 
