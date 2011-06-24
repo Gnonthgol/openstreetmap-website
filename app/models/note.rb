@@ -1,5 +1,6 @@
 class Note < ActiveRecord::Base
   include GeoRecord
+  include ERB::Util
 
   has_many :comments, :class_name => "NoteComment",
                       :foreign_key => :note_id,
@@ -38,9 +39,9 @@ class Note < ActiveRecord::Base
     self.comments.each do |comment|
       next if upto_timestamp != :nil and comment.created_at > upto_timestamp
       resp += (comment_no == 1 ? "" : separator_char)
-      resp += comment.body if comment.body
+      resp += h(comment.body) if comment.body
       resp += " [ " 
-      resp += comment.author_name if comment.author_name
+      resp += h(comment.author_name) if comment.author_name
       resp += " " + comment.created_at.to_s + " ]"
       comment_no += 1
     end

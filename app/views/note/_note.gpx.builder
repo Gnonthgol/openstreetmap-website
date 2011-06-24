@@ -1,6 +1,6 @@
 xml.wpt("lon" => note.lon, "lat" => note.lat) do
   xml.desc do
-    xml.cdata! note.flatten_comment("<hr />")
+    xml.cdata! note.comments.first.body + ' [' + note.author_name + ']'
   end
 
   xml.extension do

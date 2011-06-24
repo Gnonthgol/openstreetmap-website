@@ -23,7 +23,7 @@
     </td>
     <td><%= link_to note.id.to_s, :controller => "browse", :action => "note", :id => note.id %></td>
     <% if note.author.nil? %> 
-      <td> <%= note.author_name %> </td> 
+      <td> <%= h(note.author_name) %> </td> 
     <% else %> 
       <td><%= link_to h(note.author_name), :controller => "user", :action => "view", :display_name => note.author_name %></td>
     <% end %>
