@@ -88,7 +88,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect "api/#{API_VERSION}/notes/addPOIexec", :controller => 'note', :action => 'create'
   map.connect "api/#{API_VERSION}/notes/closePOIexec", :controller => 'note', :action => 'close'
   map.connect "api/#{API_VERSION}/notes/editPOIexec", :controller => 'note', :action => 'update'
-  map.connect "api/#{API_VERSION}/notes/getGPX", :controller => 'note', :action => 'list', :format => :gpx
+  map.connect "api/#{API_VERSION}/notes/getGPX", :controller => 'note', :action => 'list', :format => 'gpx'
   map.connect "api/#{API_VERSION}/notes/getRSSfeed", :controller => 'note', :action => 'rss'
 
   # Data browsing
