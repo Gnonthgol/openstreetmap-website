@@ -288,6 +288,7 @@ en:
       comment_by: "Comment by: "
       comment: "Comment:"
       date: "Date:"
+      closed_action: "Closed issue"
   changeset:
     changeset_paging_nav:
       showing_page: "Showing page %{page}"
