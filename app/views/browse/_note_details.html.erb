@@ -62,3 +62,24 @@
   </table>
 <% end %>
 
+<% if @note.status != "closed" %>
+  <% form_tag(:controller => 'note', :action => 'update', :id => @note.id) do %>
+    <hr />
+    <h3><%= t 'browse.note.new_comment' %></h3>
+    <table>
+      <tr>
+        <th><%= label_tag(:name, t('browse.note.name')) %></th>
+        <% if @user %>
+          <td><%= @user.display_name %></td>
+        <% else %>
+          <td><%= text_field_tag(:name, "NoName") %></td>
+        <% end %>
+      </tr>
+      <tr>
+        <th><%= label_tag(:text, t('browse.note.text')) %></th>
+        <td><%= text_area_tag(:text, "", :rows => '5', :cols => '60') %></td>
+      </tr>
+    </table>
+    <td colspan="2"><%= submit_tag(t 'browse.note.submit_comment') %></td>
+  <% end %>
+<% end %>

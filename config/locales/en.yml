@@ -289,6 +289,10 @@ en:
       comment: "Comment:"
       date: "Date:"
       closed_action: "Closed issue"
+      new_comment: "Comment on this issue"
+      name: "Name:"
+      text: "Text:"
+      submit_comment: "Comment"
   changeset:
     changeset_paging_nav:
       showing_page: "Showing page %{page}"
