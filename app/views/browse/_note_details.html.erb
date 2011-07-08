@@ -3,14 +3,16 @@
     <th><%= t 'browse.note.created_at' %></th>
     <td><%= l @note.created_at %></td>
   </tr>
-  <tr>
-    <th><%= t 'browse.note.edited_at' %></th>
-    <td><%= l @note.updated_at %></td>
-  </tr>
+  
   <% if @note.status == "closed" %>
     <tr>
       <th><%= t 'browse.note.closed_at' %></th>
       <td><%= l @note.closed_at %></td>
+    </tr>
+  <% else %>
+    <tr>
+      <th><%= t 'browse.note.commented_at' %></th>
+      <td><%= l @note.commented_at %></td>
     </tr>
   <% end %>
   <tr>

@@ -74,6 +74,10 @@ class Note < ActiveRecord::Base
     self.comments.first.author_name
   end
 
+  def commented_at
+    self.comments.last.created_at
+  end
+
   # Custom JSON output routine for notes
   def to_json(options = {})
     super options.reverse_merge(

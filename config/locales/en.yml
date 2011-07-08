@@ -281,7 +281,7 @@ en:
       open_title: "Unresolved issue: %{note_name}"
       closed_title: "Resolved issue: %{note_name}"
       created_at: "Created at:"
-      edited_at: "Edited at:"
+      commented_at: "Last commented at:"
       closed_at: "Closed at:"
       opened_by: "Opened by:"
       description: "Description:"
