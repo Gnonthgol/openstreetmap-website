@@ -4,23 +4,63 @@ class NoteControllerTest < ActionController::TestCase
   fixtures :users, :notes, :note_comments
 
   def test_note_create_success
+    # Add a new note
     assert_difference('Note.count') do
       assert_difference('NoteComment.count') do
-        post :create, {:lat => -1.0, :lon => -1.0, :name => "new_tester", :text => "This is a comment"}
+        post :create, {:lat => -1.0, :lon => -2.0, :name => "new_tester", :text => "This is a comment"}
       end
     end
     assert_response :success
     id = @response.body.sub(/ok/,"").to_i
 
-    get :read, {:id => id, :format => 'json'}
+    note = Note.find(id)
+    assert_not_nil note
+    assert_equal -1.0, note.lat
+    assert_equal -2.0, note.lon
+    assert_equal "open", note.status
+    assert_equal 1, note.comments.count
+    assert_equal "opened", note.comments.last.event
+    assert_equal "This is a comment", note.comments.last.body
+    assert_equal "new_tester (a)", note.author_name
+
+    # Add a new note without a username
+    assert_difference('Note.count') do
+      assert_difference('NoteComment.count') do
+        post :create, {:lat => -2.0, :lon => -1.0, :text => "This is a comment without username"}
+      end
+    end
     assert_response :success
-    js = ActiveSupport::JSON.decode(@response.body)
-    assert_not_nil js
-    assert_equal id, js["note"]["id"]
-    assert_equal "open", js["note"]["status"]
-    assert_equal "opened", js["note"]["comments"].last["event"]
-    assert_equal "This is a comment", js["note"]["comments"].last["body"]
-    assert_equal "new_tester (a)", js["note"]["comments"].last["author_name"]
+    id = @response.body.sub(/ok/,"").to_i
+
+    note = Note.find(id)
+    assert_not_nil note
+    assert_equal -2.0, note.lat
+    assert_equal -1.0, note.lon
+    assert_equal "open", note.status
+    assert_equal 1, note.comments.count
+    assert_equal "opened", note.comments.last.event
+    assert_equal "This is a comment without username", note.comments.last.body
+    assert_equal "NoName (a)", note.author_name
+
+    # Add a new note with a logged in user
+    basic_authorization(users(:normal_user).email, "test")
+    assert_difference('Note.count') do
+      assert_difference('NoteComment.count') do
+        post :create, {:lat => -1.0, :lon => -1.0, :name => "new_tester", :text => "This is a comment by a user"}
+      end
+    end
+    assert_response :success
+    id = @response.body.sub(/ok/,"").to_i
+
+    note = Note.find(id)
+    assert_not_nil note
+    assert_equal -1.0, note.lat
+    assert_equal -1.0, note.lon
+    assert_equal "open", note.status
+    assert_equal 1, note.comments.count
+    assert_equal "opened", note.comments.last.event
+    assert_equal "This is a comment by a user", note.comments.last.body
+    assert_equal users(:normal_user), note.comments.last.author
   end
 
   def test_note_create_fail
@@ -61,20 +101,42 @@ class NoteControllerTest < ActionController::TestCase
   end
 
   def test_note_comment_create_success
+    # Add a new comment
     assert_difference('NoteComment.count') do
       post :update, {:id => notes(:open_note_with_comment).id, :name => "new_tester2", :text => "This is an additional comment"}
     end
     assert_response :success
 
-    get :read, {:id => notes(:open_note_with_comment).id, :format => 'json'}
+    comment = notes(:open_note_with_comment).comments.last
+    assert_not_nil comment
+    assert_equal "commented", comment.event
+    assert_equal "This is an additional comment", comment.body
+    assert_equal "new_tester2 (a)", comment.author_name
+
+    # Add a new comment without username
+    assert_difference('NoteComment.count') do
+      post :update, {:id => notes(:open_note_with_comment).id, :text => "This is an additional comment without username"}
+    end
     assert_response :success
-    js = ActiveSupport::JSON.decode(@response.body)
-    assert_not_nil js
-    assert_equal notes(:open_note_with_comment).id, js["note"]["id"]
-    assert_equal "open", js["note"]["status"]
-    assert_equal "commented", js["note"]["comments"].last["event"]
-    assert_equal "This is an additional comment", js["note"]["comments"].last["body"]
-    assert_equal "new_tester2 (a)", js["note"]["comments"].last["author_name"]
+
+    comment = notes(:open_note_with_comment).comments.last
+    assert_not_nil comment
+    assert_equal "commented", comment.event
+    assert_equal "This is an additional comment without username", comment.body
+    assert_equal "NoName (a)", comment.author_name
+
+    # Add a new comment with a logged in user
+    basic_authorization(users(:normal_user).email, "test")
+    assert_difference('NoteComment.count') do
+      post :update, {:id => notes(:open_note_with_comment).id, :name => "new_tester2", :text => "This is an additional comment by a user"}
+    end
+    assert_response :success
+
+    comment = notes(:open_note_with_comment).comments.last
+    assert_not_nil comment
+    assert_equal "commented", comment.event
+    assert_equal "This is an additional comment by a user", comment.body
+    assert_equal users(:normal_user), comment.author
   end
 
   def test_note_comment_create_fail
@@ -100,17 +162,42 @@ class NoteControllerTest < ActionController::TestCase
   end
 
   def test_note_close_success
+    # Close note
+    post :close, {:id => notes(:open_note_with_comment).id, :name => "new_tester3"}
+    assert_response :success
+
+    note = Note.find(notes(:open_note_with_comment).id)
+    assert_not_nil note
+    assert_equal "closed", note.status
+    assert_equal "closed", note.comments.last.event
+    assert_equal "new_tester3 (a)", note.comments.last.author_name
+
+    note.status = "open"
+    note.save
+
+    # Close note without username
     post :close, {:id => notes(:open_note_with_comment).id}
     assert_response :success
 
-    get :read, {:id => notes(:open_note_with_comment).id, :format => 'json'}
+    note = Note.find(notes(:open_note_with_comment).id)
+    assert_not_nil note
+    assert_equal "closed", note.status
+    assert_equal "closed", note.comments.last.event
+    assert_equal "NoName (a)", note.comments.last.author_name
+
+    note.status = "open"
+    note.save
+
+    # Close note as a logged in user
+    basic_authorization(users(:normal_user).email, "test")
+    post :close, {:id => notes(:open_note_with_comment).id, :name => "new_tester3"}
     assert_response :success
-    js = ActiveSupport::JSON.decode(@response.body)
-    assert_not_nil js
-    assert_equal notes(:open_note_with_comment).id, js["note"]["id"]
-    assert_equal "closed", js["note"]["status"]
-    assert_equal "closed", js["note"]["comments"].last["event"]
-    assert_equal "NoName (a)", js["note"]["comments"].last["author_name"]
+
+    note = Note.find(notes(:open_note_with_comment).id)
+    assert_not_nil note
+    assert_equal "closed", note.status
+    assert_equal "closed", note.comments.last.event
+    assert_equal users(:normal_user), note.comments.last.author
   end
 
   def test_note_close_fail
@@ -147,14 +234,16 @@ class NoteControllerTest < ActionController::TestCase
   end
 
   def test_note_read_hidden_comment
-    get :read, {:id => notes(:note_with_hidden_comment).id, :format => 'json'}
+    note = notes(:note_with_hidden_comment);
+    get :read, {:id => note.id, :format => 'json'}
     assert_response :success
     js = ActiveSupport::JSON.decode(@response.body)
     assert_not_nil js
-    assert_equal notes(:note_with_hidden_comment).id, js["note"]["id"]
-    assert_equal 2, js["note"]["comments"].count
-    assert_equal "Valid comment for note 5", js["note"]["comments"][0]["body"]
-    assert_equal "Another valid comment for note 5", js["note"]["comments"][1]["body"]
+    assert_equal note.id, js["note"]["id"]
+    assert_equal note.comments.count, js["note"]["comments"].count
+    note.comments.count.times do |c|
+      assert_equal note.comments[c].body, js["note"]["comments"][c]["body"]
+    end
   end
 
   def test_note_read_fail
